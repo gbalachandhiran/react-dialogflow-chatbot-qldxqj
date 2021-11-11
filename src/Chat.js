@@ -109,6 +109,26 @@ const Chat = (props) => {
 
       alert('finished recording');
 
+      var reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = function () {
+        var base64data = reader.result;
+        var base64String = base64data.split(',')[1];
+        console.log(base64String);
+
+        axios
+          .post('gowthambalachandhiran.pythonanywhere.com/voice', {
+            file_string: base64String,
+          })
+          .then((response) => {
+            alert(response.data);
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.log('Error: ', error);
+          });
+      };
+
       var url = URL.createObjectURL(blob);
 
       var a = document.createElement('a');
@@ -118,7 +138,7 @@ const Chat = (props) => {
       a.download = 'sample.wav';
       a.click();
       window.URL.revokeObjectURL(url);
-    }, 10000);
+    }, 5000);
     alert('recording in progress');
     leftchannel = [];
     rightchannel = [];
@@ -126,7 +146,7 @@ const Chat = (props) => {
     recordingLength = 0;
     volume = null;
     mediaStream = null;
-    sampleRate = 44100;
+    sampleRate = 48000;
     context = null;
     blob = null;
 
