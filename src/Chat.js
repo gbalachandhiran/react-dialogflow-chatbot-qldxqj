@@ -117,7 +117,7 @@ const Chat = (props) => {
         console.log(base64String);
 
         axios
-          .post('gowthambalachandhiran.pythonanywhere.com/voice', {
+          .post('https://gowthambalachandhiran.pythonanywhere.com/voice', {
             file_string: base64String,
           })
           .then((response) => {
@@ -128,16 +128,6 @@ const Chat = (props) => {
             console.log('Error: ', error);
           });
       };
-
-      var url = URL.createObjectURL(blob);
-
-      var a = document.createElement('a');
-      document.body.appendChild(a);
-      a.style = 'display: none';
-      a.href = url;
-      a.download = 'sample.wav';
-      a.click();
-      window.URL.revokeObjectURL(url);
     }, 5000);
     alert('recording in progress');
     leftchannel = [];
@@ -247,7 +237,10 @@ const Chat = (props) => {
 
         {/*The input section is 👇*/}
         <div className="inputSection">
-          <i onClick={recordVoice} class="fa fa-microphone microphone-ico"></i>
+          <button
+            onClick={recordVoice}
+            class="fa fa-microphone microphone-ico"
+          ></button>
           <input
             type="text"
             value={currentMessage}
