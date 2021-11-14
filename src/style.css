@@ -66,7 +66,7 @@ p {
   border-bottom-right-radius: 30px 30px;
   border-top-right-radius: 30px 30px;
   border-bottom-left-radius: 30px 30px;
-  background-color: grey;
+  background-color: #1ac6ff;
   margin-left: 5px;
   color: white;
   margin-bottom: 10px;
@@ -101,7 +101,7 @@ p {
 .microphone-ico {
   position: relative;
   left: 25px;
-  top: 3px;
+
   width: 10%;
 }
 

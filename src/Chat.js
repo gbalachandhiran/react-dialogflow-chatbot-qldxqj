@@ -5,7 +5,38 @@ import './style.css';
 import Messages from './Messages';
 
 const Chat = (props) => {
-  const [responses, setResponses] = useState([]);
+  const [responses, setResponses] = useState([
+    {
+      text: 'Hi !!! This is Scooty here to collect some info to help you better!!!',
+      isBot: true,
+      id: 1,
+      isDone: true,
+    },
+  ]);
+  const [disable, setDisable] = useState(false);
+  const [age, setAge] = useState(18);
+
+  const botData = [
+    {
+      text: 'I would need to collect some information from you to start with can you please select your age',
+      isBot: true,
+      id: 2,
+      isDone: false,
+    },
+    {
+      text: 'Select Gender',
+      isBot: true,
+      id: 3,
+      isDone: false,
+    },
+    {
+      text: 'Specify the tests you did for the past 3 months BP , ECG , lipid test ',
+      isBot: true,
+      id: 4,
+      isDone: false,
+    },
+  ];
+
   const [currentMessage, setCurrentMessage] = useState('');
 
   //voice recordings
@@ -25,20 +56,64 @@ const Chat = (props) => {
     const data = {
       text: 'good morning',
     };
+    replyChats(message);
+  };
 
+  const replyChats = (message) => {
     axios
       .post('https://speech2textrasa.herokuapp.com/model/parse', {
-        text: message,
+        text: message.text,
       })
       .then((response) => {
-        alert(response.data);
+        // alert(response.data);
+        // console.log(response.data);
+        // const responseData = {
+        //   text: response.data['message']['fulfillmentText'],
+        //   isBot: true,
+        // };
+        // setResponses((responses) => [...responses, responseData]);
         console.log(response.data);
-        const responseData = {
-          text: response.data['message']['fulfillmentText'],
-          isBot: true,
-        };
+        const intent = response.data.intent.name;
 
-        setResponses((responses) => [...responses, responseData]);
+        if (
+          intent == 'greet' ||
+          intent == 'mood_great' ||
+          intent == 'bot_challenge' ||
+          intent == 'affirm'
+        ) {
+          axios
+            .post(
+              'https://speech2textrasa.herokuapp.com/webhooks/rest/webhook',
+              {
+                message: message.text,
+              }
+            )
+            .then((response) => {
+              var botvalue = null;
+
+              console.log(response.data);
+              for (var i = 0; i < botData.length; i++) {
+                if (botData[i].isDone == false) {
+                  if (botData[i].id == 2) {
+                    setDisable(true);
+                  }
+                  botData[i].isDone = true;
+                  botvalue = botData[i];
+                  break;
+                }
+              }
+              console.log('Bot Value ' + botvalue);
+              const data = [...responses];
+              data.push(message);
+              data.push({
+                text: response.data[0].text,
+                isBot: true,
+                bot: true,
+              });
+              data.push(botvalue);
+              setResponses(data);
+            });
+        }
       })
       .catch((error) => {
         console.log('Error: ', error);
@@ -56,7 +131,7 @@ const Chat = (props) => {
     };
     if (event.key == 'Enter') {
       setResponses((responses) => [...responses, message]);
-      handleMessageSubmit(message.text);
+      handleMessageSubmit(message);
       setCurrentMessage('');
     }
   };
@@ -114,15 +189,28 @@ const Chat = (props) => {
       reader.onloadend = function () {
         var base64data = reader.result;
         var base64String = base64data.split(',')[1];
-        console.log(base64String);
 
         axios
           .post('https://gowthambalachandhiran.pythonanywhere.com/voice', {
             file_string: base64String,
           })
           .then((response) => {
-            alert(response.data);
             console.log(response.data);
+            const message = {
+              text: 'Hello hi',
+              isBot: false,
+            };
+
+            const data = [...responses];
+            data.push(message);
+
+            data.push({
+              text: 'I would need to collect some information from you to start with can you please select your age',
+              isBot: true,
+              id: 2,
+              isDone: true,
+            });
+            setResponses(data);
           })
           .catch((error) => {
             console.log('Error: ', error);
@@ -232,12 +320,15 @@ const Chat = (props) => {
     <div className="chatSection">
       <div className="botContainer">
         <div className="messagesContainer">
-          <Messages messages={responses} />
+          <div className="messageCard">
+            <Messages messages={responses} />
+          </div>
         </div>
 
         {/*The input section is 👇*/}
         <div className="inputSection">
           <button
+            disabled={disable}
             onClick={recordVoice}
             class="fa fa-microphone microphone-ico"
           ></button>
@@ -245,6 +336,7 @@ const Chat = (props) => {
             type="text"
             value={currentMessage}
             onChange={handleMessageChange}
+            disabled={disable}
             onKeyDown={handleSubmit}
             placeholder="Say something..."
             className="messageInputField"
