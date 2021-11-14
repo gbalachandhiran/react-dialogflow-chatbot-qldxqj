@@ -105,6 +105,23 @@ p {
   width: 10%;
 }
 
+.radio-btn-container {
+  display: flex;
+}
+
+.radio-btn {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 15px;
+  background: #6c63ff;
+}
+.radio-btn:hover {
+  margin: 11px;
+  padding: 10px;
+  border-radius: 15px;
+  background: #6c63ff;
+}
+
 @media only screen and (min-width: 992px) {
   .inputSection {
     display: flex;

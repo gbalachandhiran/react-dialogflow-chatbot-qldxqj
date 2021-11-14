@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 const Message = ({ message, selectAge }) => {
   const [value, onChange] = useState(18);
   const [disable, setDisable] = useState(false);
+  const [gender, setGender] = useState('Male');
   if (message.isBot) {
     if (message.id == 1 && message.isDone) {
       return (
@@ -63,7 +64,57 @@ const Message = ({ message, selectAge }) => {
     }
 
     if (message.id == 3 && message.isDone) {
-      return <div className="botCard"></div>;
+      return (
+        <div className="botCard">
+          <div className="radio-btn-container">
+            <div
+              className="radio-btn"
+              onClick={() => {
+                setGender('Male');
+              }}
+            >
+              <input
+                type="radio"
+                value={gender}
+                name="gender"
+                checked={gender == 'Male'}
+              />
+              Male
+            </div>
+            <div
+              className="radio-btn"
+              onClick={() => {
+                setGender('Female');
+              }}
+            >
+              <input
+                type="radio"
+                value={gender}
+                name="gender"
+                checked={gender == 'Female'}
+              />
+              Female
+            </div>
+            <div
+              className="radio-btn"
+              onClick={() => {
+                setGender('Other');
+              }}
+            >
+              <input
+                type="radio"
+                value={gender}
+                name="gender"
+                checked={gender == 'Other'}
+              />
+              Other
+            </div>
+          </div>
+          <div>
+            <button>Select</button>
+          </div>
+        </div>
+      );
     }
 
     if (message.bot) {

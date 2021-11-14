@@ -60,9 +60,22 @@ const Chat = (props) => {
   };
   function selectAge(value, event) {
     setAge(value);
-    for (var i = 0; i < botData.length; i++) {
-      alert(botData[i].isDone);
-    }
+    // for (var i = 0; i < botData.length; i++) {
+    //   alert(botData[i].isDone);
+    // }
+    const data = [...responses];
+    data.push({
+      text: 'Select Gender',
+      isBot: true,
+      bot: true,
+    });
+    data.push({
+      text: 'Select Gender',
+      isBot: true,
+      id: 3,
+      isDone: true,
+    });
+    setResponses(data);
   }
   const replyChats = (message) => {
     axios
@@ -118,6 +131,15 @@ const Chat = (props) => {
               data.push(botvalue);
               setResponses(data);
             });
+        } else {
+          const data = [...responses];
+          data.push(message);
+          data.push({
+            text: 'Please Be More Specific',
+            isBot: true,
+            bot: true,
+          });
+          setResponses(data);
         }
       })
       .catch((error) => {
