@@ -58,10 +58,12 @@ const Chat = (props) => {
     };
     replyChats(message);
   };
-  const selectAge = (value) => {
-    // the callback. Use a better name
-    alert(value);
-  };
+  function selectAge(value, event) {
+    setAge(value);
+    for (var i = 0; i < botData.length; i++) {
+      alert(botData[i].isDone);
+    }
+  }
   const replyChats = (message) => {
     axios
       .post('https://speech2textrasa.herokuapp.com/model/parse', {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 const Message = ({ message, selectAge }) => {
   const [value, onChange] = useState(18);
+  const [disable, setDisable] = useState(false);
   if (message.isBot) {
     if (message.id == 1 && message.isDone) {
       return (
@@ -42,21 +43,27 @@ const Message = ({ message, selectAge }) => {
               min="18"
               max="100"
               value={value}
+              disabled={disable}
               onChange={({ target: { value: radius } }) => {
                 onChange(radius);
               }}
             />
             <div className="buble">{value}</div>
             <button
-              onClick={() => {
-                selectAge(value);
-              }} //this is where it needs to be passed
+              onClick={(event) => {
+                setDisable(true);
+                selectAge(value, event);
+              }}
             >
-              Select Age
+              Select
             </button>
           </div>
         </div>
       );
+    }
+
+    if (message.id == 3 && message.isDone) {
+      return <div className="botCard"></div>;
     }
 
     if (message.bot) {
