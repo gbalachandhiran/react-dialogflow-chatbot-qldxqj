@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Message = ({ message }) => {
+const Message = ({ message, selectAge }) => {
   const [value, onChange] = useState(18);
   if (message.isBot) {
     if (message.id == 1 && message.isDone) {
@@ -47,7 +47,13 @@ const Message = ({ message }) => {
               }}
             />
             <div className="buble">{value}</div>
-            <button click>Select</button>
+            <button
+              onClick={() => {
+                selectAge(value);
+              }} //this is where it needs to be passed
+            >
+              Select Age
+            </button>
           </div>
         </div>
       );
