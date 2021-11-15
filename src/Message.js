@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Message = ({ message, selectAge }) => {
+const Message = ({ message, selectAge, selectGender }) => {
   const [value, onChange] = useState(18);
   const [disable, setDisable] = useState(false);
   const [gender, setGender] = useState('Male');
@@ -111,7 +111,13 @@ const Message = ({ message, selectAge }) => {
             </div>
           </div>
           <div>
-            <button>Select</button>
+            <button
+              onClick={(event) => {
+                selectGender(gender, event);
+              }}
+            >
+              Select
+            </button>
           </div>
         </div>
       );

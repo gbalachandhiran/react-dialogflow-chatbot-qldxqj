@@ -15,7 +15,7 @@ const Chat = (props) => {
   ]);
   const [disable, setDisable] = useState(false);
   const [age, setAge] = useState(18);
-
+  const [gender, setGender] = useState('Male');
   const botData = [
     {
       text: 'I would need to collect some information from you to start with can you please select your age',
@@ -74,6 +74,18 @@ const Chat = (props) => {
       isBot: true,
       id: 3,
       isDone: true,
+    });
+    setResponses(data);
+  }
+
+  function selectGender(value, event) {
+    setGender(value);
+    const data = [...responses];
+
+    data.push({
+      text: 'Specify the tests you did for the past 3 months BP , ECG , lipid test',
+      isBot: true,
+      bot: true,
     });
     setResponses(data);
   }
@@ -348,7 +360,11 @@ const Chat = (props) => {
       <div className="botContainer">
         <div className="messagesContainer">
           <div className="messageCard">
-            <Messages messages={responses} selectAge={selectAge} />
+            <Messages
+              messages={responses}
+              selectAge={selectAge}
+              selectGender={selectGender}
+            />
           </div>
         </div>
 
