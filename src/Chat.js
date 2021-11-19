@@ -14,9 +14,9 @@ const Chat = (props) => {
     },
   ]);
   const [disable, setDisable] = useState(false);
-  const [age, setAge] = useState(18);
+  const [age, setAge] = useState(19);
   const [gender, setGender] = useState('Male');
-  const botData = [
+  const [botData, setBotData] = useState([
     {
       text: 'I would need to collect some information from you to start with can you please select your age',
       isBot: true,
@@ -35,7 +35,7 @@ const Chat = (props) => {
       id: 4,
       isDone: false,
     },
-  ];
+  ]);
 
   const [currentMessage, setCurrentMessage] = useState('');
 
@@ -122,16 +122,23 @@ const Chat = (props) => {
               var botvalue = null;
 
               console.log(response.data);
-              for (var i = 0; i < botData.length; i++) {
-                if (botData[i].isDone == false) {
-                  if (botData[i].id == 2) {
+              var botCopy = [...botData];
+              for (var i = 0; i < botCopy.length; i++) {
+                if (botCopy[i].isDone == false) {
+                  if (botCopy[i].id == 2) {
                     setDisable(true);
+                    if (isNaN(Number(message.text))) {
+                      defaultResponse(message);
+                    } else {
+                      setAge(Number(message.text));
+                    }
                   }
-                  botData[i].isDone = true;
-                  botvalue = botData[i];
+                  botCopy[i].isDone = true;
+                  botvalue = botCopy[i];
                   break;
                 }
               }
+              setBotData(botCopy);
               console.log('Bot Value ' + botvalue);
               const data = [...responses];
               data.push(message);
@@ -144,21 +151,23 @@ const Chat = (props) => {
               setResponses(data);
             });
         } else {
-          const data = [...responses];
-          data.push(message);
-          data.push({
-            text: 'Please Be More Specific',
-            isBot: true,
-            bot: true,
-          });
-          setResponses(data);
+          defaultResponse(message);
         }
       })
       .catch((error) => {
         console.log('Error: ', error);
       });
   };
-
+  const defaultResponse = (message) => {
+    const data = [...responses];
+    data.push(message);
+    data.push({
+      text: 'Please Be More Specific',
+      isBot: true,
+      bot: true,
+    });
+    setResponses(data);
+  };
   const handleMessageChange = (event) => {
     setCurrentMessage(event.target.value);
   };
@@ -236,20 +245,10 @@ const Chat = (props) => {
           .then((response) => {
             console.log(response.data);
             const message = {
-              text: 'Hello hi',
+              text: response.data.transcribed_text,
               isBot: false,
             };
-
-            const data = [...responses];
-            data.push(message);
-
-            data.push({
-              text: 'I would need to collect some information from you to start with can you please select your age',
-              isBot: true,
-              id: 2,
-              isDone: true,
-            });
-            setResponses(data);
+            replyChats(message);
           })
           .catch((error) => {
             console.log('Error: ', error);
@@ -371,7 +370,6 @@ const Chat = (props) => {
         {/*The input section is 👇*/}
         <div className="inputSection">
           <button
-            disabled={disable}
             onClick={recordVoice}
             class="fa fa-microphone microphone-ico"
           ></button>
