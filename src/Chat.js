@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import useForceUpdate from 'use-force-update';
 
 import './style.css';
 import Messages from './Messages';
@@ -17,6 +18,7 @@ const Chat = (props) => {
   const [age, setAge] = useState(53);
   const [gender, setGender] = useState('Male');
   const [botFlag, setBotFlag] = useState(true);
+  const forceUpdate = useForceUpdate();
   const [botData, setBotData] = useState([
     {
       text: 'I would need to collect some information from you to start with can you please select your age',
@@ -122,8 +124,9 @@ const Chat = (props) => {
             alert('male');
           } else if (message.text.trim() == 'female') {
             alert('female');
-            setGender('Female');
           }
+          setGender('Female');
+          forceUpdate();
         } else if (
           intent == 'greet' ||
           intent == 'mood_great' ||
