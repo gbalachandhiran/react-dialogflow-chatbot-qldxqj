@@ -2,7 +2,7 @@ import React from 'react';
 import './style.css';
 import Message from './Message';
 
-const Messages = ({ messages, selectAge, selectGender, age }) => {
+const Messages = ({ messages, selectAge, selectGender, age, sex }) => {
   console.log('Messages: ' + messages);
   return (
     <div className="messagesSection">
@@ -14,6 +14,7 @@ const Messages = ({ messages, selectAge, selectGender, age }) => {
               selectAge={selectAge}
               selectGender={selectGender}
               age={age}
+              sex={sex}
             />
           </div>
         );

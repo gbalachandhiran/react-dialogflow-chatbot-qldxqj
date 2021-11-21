@@ -107,7 +107,7 @@ const Chat = (props) => {
         const intent = response.data.intent.name;
 
         if (botData[0].isDone == true && botData[1].isDone == false) {
-          setDisable(true);
+          alert('select age');
           if (isNaN(Number(message.text))) {
             // defaultResponse(message);
             setBotFlag(false);
@@ -115,6 +115,14 @@ const Chat = (props) => {
             alert(Number(message.text));
             setAge(27);
             serviceResponse(message);
+          }
+        } else if (botData[1].isDone == true && botData[2].isDone == false) {
+          alert('select gender');
+          if (message.text == 'male') {
+            alert('male');
+          } else if (message.text.trim() == 'female') {
+            alert('female');
+            setGender('Female');
           }
         } else if (
           intent == 'greet' ||
@@ -149,7 +157,7 @@ const Chat = (props) => {
       })
       .then((response) => {
         var botvalue = null;
-
+        setDisable(true);
         console.log(response.data);
         var botCopy = [...botData];
         for (var i = 0; i < botCopy.length; i++) {
@@ -368,6 +376,7 @@ const Chat = (props) => {
               selectAge={selectAge}
               selectGender={selectGender}
               age={age}
+              sex={gender}
             />
           </div>
         </div>

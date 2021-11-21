@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-const Message = ({ message, selectAge, selectGender, age }) => {
+const Message = ({ message, selectAge, selectGender, age, sex }) => {
   const [value, setValue] = useState(age);
   const [disable, setDisable] = useState(false);
-  const [gender, setGender] = useState('Male');
+  const [gender, setGender] = useState(sex);
 
   if (message.isBot) {
     if (message.id == 1 && message.isDone) {
