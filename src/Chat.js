@@ -14,8 +14,9 @@ const Chat = (props) => {
     },
   ]);
   const [disable, setDisable] = useState(false);
-  const [age, setAge] = useState(19);
+  const [age, setAge] = useState(53);
   const [gender, setGender] = useState('Male');
+  const [botFlag, setBotFlag] = useState(true);
   const [botData, setBotData] = useState([
     {
       text: 'I would need to collect some information from you to start with can you please select your age',
@@ -105,51 +106,23 @@ const Chat = (props) => {
         console.log(response.data);
         const intent = response.data.intent.name;
 
-        if (
+        if (botData[0].isDone == true && botData[1].isDone == false) {
+          setDisable(true);
+          if (isNaN(Number(message.text))) {
+            // defaultResponse(message);
+            setBotFlag(false);
+          } else {
+            alert(Number(message.text));
+            setAge(27);
+            serviceResponse(message);
+          }
+        } else if (
           intent == 'greet' ||
           intent == 'mood_great' ||
           intent == 'bot_challenge' ||
           intent == 'affirm'
         ) {
-          axios
-            .post(
-              'https://speech2textrasa.herokuapp.com/webhooks/rest/webhook',
-              {
-                message: message.text,
-              }
-            )
-            .then((response) => {
-              var botvalue = null;
-
-              console.log(response.data);
-              var botCopy = [...botData];
-              for (var i = 0; i < botCopy.length; i++) {
-                if (botCopy[i].isDone == false) {
-                  if (botCopy[i].id == 2) {
-                    setDisable(true);
-                    if (isNaN(Number(message.text))) {
-                      defaultResponse(message);
-                    } else {
-                      setAge(Number(message.text));
-                    }
-                  }
-                  botCopy[i].isDone = true;
-                  botvalue = botCopy[i];
-                  break;
-                }
-              }
-              setBotData(botCopy);
-              console.log('Bot Value ' + botvalue);
-              const data = [...responses];
-              data.push(message);
-              data.push({
-                text: response.data[0].text,
-                isBot: true,
-                bot: true,
-              });
-              data.push(botvalue);
-              setResponses(data);
-            });
+          serviceResponse(message);
         } else {
           defaultResponse(message);
         }
@@ -167,6 +140,37 @@ const Chat = (props) => {
       bot: true,
     });
     setResponses(data);
+  };
+
+  const serviceResponse = (message) => {
+    axios
+      .post('https://speech2textrasa.herokuapp.com/webhooks/rest/webhook', {
+        message: message.text,
+      })
+      .then((response) => {
+        var botvalue = null;
+
+        console.log(response.data);
+        var botCopy = [...botData];
+        for (var i = 0; i < botCopy.length; i++) {
+          if (botCopy[i].isDone == false) {
+            botCopy[i].isDone = botFlag;
+            botvalue = botCopy[i];
+            break;
+          }
+        }
+        setBotData(botCopy);
+        console.log('Bot Value ' + botvalue);
+        const data = [...responses];
+        data.push(message);
+        data.push({
+          text: response.data[0].text,
+          isBot: true,
+          bot: true,
+        });
+        data.push(botvalue);
+        setResponses(data);
+      });
   };
   const handleMessageChange = (event) => {
     setCurrentMessage(event.target.value);
@@ -363,6 +367,7 @@ const Chat = (props) => {
               messages={responses}
               selectAge={selectAge}
               selectGender={selectGender}
+              age={age}
             />
           </div>
         </div>

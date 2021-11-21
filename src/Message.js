@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const Message = ({ message, selectAge, selectGender }) => {
-  const [value, onChange] = useState(18);
+const Message = ({ message, selectAge, selectGender, age }) => {
+  const [value, setValue] = useState(age);
   const [disable, setDisable] = useState(false);
   const [gender, setGender] = useState('Male');
+
   if (message.isBot) {
     if (message.id == 1 && message.isDone) {
       return (
@@ -45,9 +46,7 @@ const Message = ({ message, selectAge, selectGender }) => {
               max="100"
               value={value}
               disabled={disable}
-              onChange={({ target: { value: radius } }) => {
-                onChange(radius);
-              }}
+              onChange={(e) => setValue(e.target.value)}
             />
             <div className="buble">{value}</div>
             <button
