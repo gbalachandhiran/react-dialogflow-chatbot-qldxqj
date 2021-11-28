@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import useForceUpdate from 'use-force-update';
 
@@ -8,17 +8,19 @@ import Messages from './Messages';
 const Chat = (props) => {
   const [responses, setResponses] = useState([
     {
-      text: 'Hi !!! This is Scooty here to collect some info to help you better!!!',
+      text: 'Hi This is Scooty!! the bot here to collect some basic information from you. Kindly select how you want our interaction to happen. You can either select Text by clicking "Text" button below or say "Speech" after holding Mic button',
       isBot: true,
       id: 1,
       isDone: true,
     },
   ]);
+  const [speechBool, setSpeechBool] = useState(true);
   const [disable, setDisable] = useState(false);
   const [age, setAge] = useState(53);
   const [gender, setGender] = useState('Male');
   const [botFlag, setBotFlag] = useState(true);
   const forceUpdate = useForceUpdate();
+  const [seconds, setSeconds] = useState(10);
   const [botData, setBotData] = useState([
     {
       text: 'I would need to collect some information from you to start with can you please select your age',
@@ -40,6 +42,34 @@ const Chat = (props) => {
     },
   ]);
 
+  const [speechData, setSpeechData] = useState([
+    {
+      text: 'I would need to collect some information from you to start with can you please select your age',
+
+      id: 31,
+      isDone: false,
+      confirm: false,
+      speech: true,
+    },
+    {
+      text: 'Select Gender',
+
+      id: 32,
+      isDone: false,
+      confirm: false,
+      speech: true,
+    },
+    {
+      text: 'Specify the tests you did for the past 3 months BP , ECG , lipid test ',
+
+      id: 33,
+      isDone: false,
+      confirm: false,
+      speech: true,
+    },
+  ]);
+  var attempt = 0;
+  var counter = 0;
   const [currentMessage, setCurrentMessage] = useState('');
 
   //voice recordings
@@ -52,8 +82,26 @@ const Chat = (props) => {
   var sampleRate;
   var context = null;
   var blob = null;
-
+  
   //end of voice recordings
+  useEffect(() => {
+    if (speechBool) {
+      setSpeechBool(false);
+      var msg = new SpeechSynthesisUtterance();
+      msg.text =
+        'Hi This is Scooty!! the bot here to collect some basic information from you. Kindly select how you want our interaction to happen. You can either select Text by clicking "Text" button below or say "Speech" after holding Mic button';
+      window.speechSynthesis.speak(msg);
+
+      //To abort the interval you can use this:
+
+      // setInterval(() => setSeconds(seconds - 1), 1000);
+
+      //alert(seconds);
+      msg.onend = function (event) {
+        recordVoice();
+      };
+    }
+  },[attempt]);
 
   const handleMessageSubmit = (message) => {
     const data = {
@@ -202,6 +250,7 @@ const Chat = (props) => {
   const recordVoice = () => {
     setTimeout(function () {
       // stop recording
+
       recorder.disconnect(context.destination);
       mediaStream.disconnect(recorder);
 
@@ -258,12 +307,94 @@ const Chat = (props) => {
             file_string: base64String,
           })
           .then((response) => {
-            console.log(response.data);
-            const message = {
-              text: response.data.transcribed_text,
-              isBot: false,
-            };
-            replyChats(message);
+            alert(response.data.transcribed_text);
+            // const message = {
+            //   text: response.data.transcribed_text,
+            //   isBot: false,
+            // };
+            const message =  new Object();
+            message.text = response.data.transcribed_text;
+            message.isBot = false;
+            //replyChats(message);
+            alert("attempt "+attempt);
+            if (attempt < 1) {
+              //first message
+              if (speechData[0].isDone == false) {
+                if (response.data.transcribed_text.trim() == 'speech') {
+                  attempt=0;
+                  var speechValue = [...speechData];
+                  speechValue[0].isDone = true;
+                  setSpeechData(speechValue);
+                  const data = [...responses];
+                  data.push(message);
+                  data.push(speechData[0]);
+                  alert(speechData[0]);
+                  setResponses(data);
+                  var msg = new SpeechSynthesisUtterance();
+                  msg.text = speechData[0].text;
+
+                  window.speechSynthesis.speak(msg);
+                  msg.onend = function (event) {
+                    recordVoice();
+                  };
+                } else {
+                  attempt++;
+                 
+                  const data = [];
+                  data.push(message);
+                 
+                 // setResponses(data);
+                 setResponses(responses => ([...responses, ...data]));
+
+
+                  recordVoice();
+                }
+              }
+              //Second message
+              else if (speechData[0].isDone == true && speechData[1].isDone == false){
+
+                if(!isNaN(Number(response.data.transcribed_text.trim()))){
+                  alert("its a number");
+                  setAge(Number(response.data.transcribed_text.trim()));
+                  message.text = response.data.transcribed_text.trim();
+                  message.isBot = false;
+                  const data = [];
+                  data.push(new Object(message));
+                  data.push(
+                    {
+                      text: 'Please confirm your age by saying '+message.text+' again or say no to change your age',
+                      speech: true,
+                  
+                    }
+
+                  )
+                  
+                  setResponses(responses => ([...responses, ...data]));
+
+                  var msg = new SpeechSynthesisUtterance();
+                  msg.text = 'Please confirm your age by saying '+message.text+' again or say no to change your age';
+
+                  window.speechSynthesis.speak(msg);
+                  msg.onend = function (event) {
+                    recordVoice();
+                  };
+                }
+
+              }
+
+            } else {
+              const data = [];
+              data.push({
+                text: 'Please contact this no x44545x for better assistance',
+
+                speech: true,
+              });
+              var msg = new SpeechSynthesisUtterance();
+              msg.text = 'Please contact this no x44545x for better assistance';
+
+              window.speechSynthesis.speak(msg);
+              setResponses(responses => ([...responses, ...data]));
+            }
           })
           .catch((error) => {
             console.log('Error: ', error);
@@ -321,14 +452,17 @@ const Chat = (props) => {
             numberOfOutputChannels
           );
         }
-
+        var idx = 0;
         recorder.onaudioprocess = function (e) {
+          idx++;
+
           leftchannel.push(new Float32Array(e.inputBuffer.getChannelData(0)));
           rightchannel.push(new Float32Array(e.inputBuffer.getChannelData(1)));
           recordingLength += bufferSize;
         };
 
         // we connect the recorder
+
         mediaStream.connect(recorder);
         recorder.connect(context.destination);
       },
@@ -386,15 +520,13 @@ const Chat = (props) => {
 
         {/*The input section is 👇*/}
         <div className="inputSection">
-          <button
-            onClick={recordVoice}
-            class="fa fa-microphone microphone-ico"
-          ></button>
+          <button class="fa fa-microphone microphone-ico"> </button>
+
           <input
             type="text"
             value={currentMessage}
             onChange={handleMessageChange}
-            disabled={disable}
+            disabled={true}
             onKeyDown={handleSubmit}
             placeholder="Say something..."
             className="messageInputField"
