@@ -52,7 +52,7 @@ const Chat = (props) => {
       speech: true,
     },
     {
-      text: 'Select Gender',
+      text: 'Select Gender For example if your male say male  ,if your female say female,or just say other',
 
       id: 32,
       isDone: false,
@@ -60,7 +60,12 @@ const Chat = (props) => {
       speech: true,
     },
     {
-      text: 'Specify the tests you did for the past 3 months BP , ECG , lipid test ',
+      text: 'Please select one or more tests from the list that you took for the past 3 months. You can say other if none of the items match your tests'+
+      '1.HDL'+
+      '2 LDL'+
+      '3 ECG'+
+      '4 EKG'+
+      '5 CBC',
 
       id: 33,
       isDone: false,
@@ -71,6 +76,9 @@ const Chat = (props) => {
   var attempt = 0;
   var ageCounter = 0;
   var ageValue = '';
+
+  var genderCounter = 0;
+  var genderValue = '';
   const [currentMessage, setCurrentMessage] = useState('');
 
   //voice recordings
@@ -440,7 +448,114 @@ const Chat = (props) => {
           msg.text = 'Please Select your valid age again ';
           setResponses(responses => ([...responses, ...data]));
           window.speechSynthesis.speak(msg);
+          msg.onend = function (event) {
+            recordVoice();
+          };
                 }
+
+              }
+              //Third message
+              else if (speechData[1].isDone == true && speechData[2].isDone == false){
+
+                var sex = response.data.transcribed_text.trim();
+                if(sex=='male' || sex=='female' || sex=='other'){
+                 if(genderCounter<1){
+                  genderCounter++;
+                  genderValue = response.data.transcribed_text.trim();
+                  
+                  message.text = response.data.transcribed_text.trim();
+                  message.isBot = false;
+                  const data = [];
+                  data.push(new Object(message));
+                  data.push(
+                    {
+                      text: 'Please confirm your Gender by saying '+message.text+' again or say no to change your gender',
+                      speech: true,
+                  
+                    }
+
+                  )
+                  
+                  setResponses(responses => ([...responses, ...data]));
+                  
+                  var msg = new SpeechSynthesisUtterance();
+                  msg.text = 'Please confirm your Gender by saying '+message.text+' again or say no to change your gender';
+
+                  window.speechSynthesis.speak(msg);
+                  msg.onend = function (event) {
+                    recordVoice();
+                  };
+
+                 }
+                 else if(genderCounter>=1){
+
+                  message.text = response.data.transcribed_text.trim();
+                  message.isBot = false;
+                  const data = [];
+                  data.push(new Object(message));
+                  if(genderValue==sex){
+                      alert("gender matching");
+                      attempt = 0;
+                      var speechValue = [...speechData];
+                      speechValue[2].isDone = true;
+                      setSpeechData(speechValue);
+                      data.push(speechData[2]);
+                      setResponses(responses => ([...responses, ...data]));
+                      var msg = new SpeechSynthesisUtterance();
+                      msg.text = speechData[2].text;
+
+                    window.speechSynthesis.speak(msg);
+                     msg.onend = function (event) {
+                    recordVoice();
+                  };
+                  }
+                  else{
+                    alert("gender not matching");
+                    genderCounter = 0;
+                    attempt++;
+                    const data = [];
+                      data.push({
+                    text: 'Please Select your  valid gender again ',
+
+                    speech: true,
+                   });
+              var msg = new SpeechSynthesisUtterance();
+              msg.text = 'Please Select your  valid gender again ';
+              setResponses(responses => ([...responses, ...data]));
+              window.speechSynthesis.speak(msg);
+              msg.onend = function (event) {
+                recordVoice();
+              };
+                  }
+
+
+                 }
+                }
+                else{
+
+                  genderCounter = 0;
+                  attempt++;
+                  const data = [];
+                  data.push({
+                text: 'Please Select your your valid gender again ',
+
+                speech: true,
+               });
+          var msg = new SpeechSynthesisUtterance();
+          msg.text = 'Please Select your valid gender again ';
+          setResponses(responses => ([...responses, ...data]));
+          window.speechSynthesis.speak(msg);
+          msg.onend = function (event) {
+            recordVoice();
+          };
+
+                }
+
+              }
+
+              //fouth message
+              if(speechData[2].isDone == true){
+                
 
               }
 
