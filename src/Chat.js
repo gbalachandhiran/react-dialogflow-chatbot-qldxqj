@@ -69,7 +69,8 @@ const Chat = (props) => {
     },
   ]);
   var attempt = 0;
-  var counter = 0;
+  var ageCounter = 0;
+  var ageValue = '';
   const [currentMessage, setCurrentMessage] = useState('');
 
   //voice recordings
@@ -89,7 +90,7 @@ const Chat = (props) => {
       setSpeechBool(false);
       var msg = new SpeechSynthesisUtterance();
       msg.text =
-        'Hi This is Scooty!! the bot here to collect some basic information from you. Kindly select how you want our interaction to happen. You can either select Text by clicking "Text" button below or say "Speech" after holding Mic button';
+        'Hi This is Scooty!! the bot here to collect some basic information from you. Kindly select how you want our interaction to happen. You can either select Text by clicking "Text" button below or say "Speech" ';
       window.speechSynthesis.speak(msg);
 
       //To abort the interval you can use this:
@@ -317,7 +318,7 @@ const Chat = (props) => {
             message.isBot = false;
             //replyChats(message);
             alert("attempt "+attempt);
-            if (attempt < 1) {
+            if (attempt < 5) {
               //first message
               if (speechData[0].isDone == false) {
                 if (response.data.transcribed_text.trim() == 'speech') {
@@ -325,11 +326,12 @@ const Chat = (props) => {
                   var speechValue = [...speechData];
                   speechValue[0].isDone = true;
                   setSpeechData(speechValue);
-                  const data = [...responses];
+                  const data = [];
                   data.push(message);
                   data.push(speechData[0]);
                   alert(speechData[0]);
-                  setResponses(data);
+                  setResponses(responses => ([...responses, ...data]));
+                  attempt = 0;
                   var msg = new SpeechSynthesisUtterance();
                   msg.text = speechData[0].text;
 
@@ -355,7 +357,10 @@ const Chat = (props) => {
 
                 if(!isNaN(Number(response.data.transcribed_text.trim()))){
                   alert("its a number");
-                  setAge(Number(response.data.transcribed_text.trim()));
+
+                  if(ageCounter<1){
+                    ageValue = Number(response.data.transcribed_text.trim());
+                  
                   message.text = response.data.transcribed_text.trim();
                   message.isBot = false;
                   const data = [];
@@ -370,7 +375,7 @@ const Chat = (props) => {
                   )
                   
                   setResponses(responses => ([...responses, ...data]));
-
+                  ageCounter++;
                   var msg = new SpeechSynthesisUtterance();
                   msg.text = 'Please confirm your age by saying '+message.text+' again or say no to change your age';
 
@@ -378,6 +383,63 @@ const Chat = (props) => {
                   msg.onend = function (event) {
                     recordVoice();
                   };
+                }
+                else if(ageCounter>=1){
+
+                  message.text = response.data.transcribed_text.trim();
+                  message.isBot = false;
+                  const data = [];
+                  data.push(new Object(message));
+                  if(ageValue==message.text){
+                      alert("age matching");
+                      attempt = 0;
+                      var speechValue = [...speechData];
+                      speechValue[1].isDone = true;
+                      setSpeechData(speechValue);
+                      data.push(speechData[1]);
+                      setResponses(responses => ([...responses, ...data]));
+                      var msg = new SpeechSynthesisUtterance();
+                      msg.text = speechData[1].text;
+
+                    window.speechSynthesis.speak(msg);
+                     msg.onend = function (event) {
+                    recordVoice();
+                  };
+                  }
+                  else{
+                    alert("age not matching");
+                    ageCounter = 0;
+                    attempt++;
+                    const data = [];
+                      data.push({
+                    text: 'Please Select your  valid age again ',
+
+                    speech: true,
+                   });
+              var msg = new SpeechSynthesisUtterance();
+              msg.text = 'Please Select your  valid age again ';
+              setResponses(responses => ([...responses, ...data]));
+              window.speechSynthesis.speak(msg);
+              msg.onend = function (event) {
+                recordVoice();
+              };
+                  }
+
+                }
+                }
+                else{
+                  ageCounter = 0;
+                  attempt++;
+                  const data = [];
+                  data.push({
+                text: 'Please Select your your valid age again ',
+
+                speech: true,
+               });
+          var msg = new SpeechSynthesisUtterance();
+          msg.text = 'Please Select your valid age again ';
+          setResponses(responses => ([...responses, ...data]));
+          window.speechSynthesis.speak(msg);
                 }
 
               }
