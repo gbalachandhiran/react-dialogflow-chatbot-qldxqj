@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import useForceUpdate from 'use-force-update';
+import Loader from "react-loader-spinner";
 
 import './style.css';
 import Messages from './Messages';
-
+import Timer  from './Timer';
 const Chat = (props) => {
   const [responses, setResponses] = useState([
     {
-      text: 'Hi This is Scooty!! the bot here to collect some basic information from you. Kindly select how you want our interaction to happen. You can either select Text by clicking "Text" button below or say "Speech" after holding Mic button',
+      text: 'Hi This is Scooty!! the bot here to collect some basic information from you. Kindly select how you want our interaction to happen. You can either select Text by clicking "Text" button below or say "Speech"',
       isBot: true,
       id: 1,
       isDone: true,
@@ -61,11 +62,7 @@ const Chat = (props) => {
     },
     {
       text: 'Please select one or more tests from the list that you took for the past 3 months. You can say other if none of the items match your tests'+
-      '1.HDL'+
-      '2 LDL'+
-      '3 ECG'+
-      '4 EKG'+
-      '5 CBC',
+      'HDL,LDL,ECG,EKG,CBC',
 
       id: 33,
       isDone: false,
@@ -80,7 +77,7 @@ const Chat = (props) => {
   var genderCounter = 0;
   var genderValue = '';
   const [currentMessage, setCurrentMessage] = useState('');
-
+  const [spinnerLoading, setSpinnerLoading] = useState(false);
   //voice recordings
   var leftchannel;
   var rightchannel;
@@ -91,7 +88,7 @@ const Chat = (props) => {
   var sampleRate;
   var context = null;
   var blob = null;
-  
+  var cnter = 10;
   //end of voice recordings
   useEffect(() => {
     if (speechBool) {
@@ -102,15 +99,16 @@ const Chat = (props) => {
       window.speechSynthesis.speak(msg);
 
       //To abort the interval you can use this:
-
-      // setInterval(() => setSeconds(seconds - 1), 1000);
+     
+      // setInterval(() => cnter--, 1000);
 
       //alert(seconds);
       msg.onend = function (event) {
         recordVoice();
       };
     }
-  },[attempt]);
+    
+  },[attempt,seconds]);
 
   const handleMessageSubmit = (message) => {
     const data = {
@@ -166,12 +164,12 @@ const Chat = (props) => {
         const intent = response.data.intent.name;
 
         if (botData[0].isDone == true && botData[1].isDone == false) {
-          alert('select age');
+         // alert('select age');
           if (isNaN(Number(message.text))) {
             // defaultResponse(message);
             setBotFlag(false);
           } else {
-            alert(Number(message.text));
+            //alert(Number(message.text));
             setAge(27);
             serviceResponse(message);
           }
@@ -303,7 +301,9 @@ const Chat = (props) => {
       // our final blob
       blob = new Blob([view], { type: 'audio/wav' });
 
-      alert('finished recording');
+     // alert('finished recording');
+      setSpinnerLoading(false);
+      
 
       var reader = new FileReader();
       reader.readAsDataURL(blob);
@@ -316,7 +316,7 @@ const Chat = (props) => {
             file_string: base64String,
           })
           .then((response) => {
-            alert(response.data.transcribed_text);
+           // alert(response.data.transcribed_text);
             // const message = {
             //   text: response.data.transcribed_text,
             //   isBot: false,
@@ -325,7 +325,7 @@ const Chat = (props) => {
             message.text = response.data.transcribed_text;
             message.isBot = false;
             //replyChats(message);
-            alert("attempt "+attempt);
+            //alert("attempt "+attempt);
             if (attempt < 5) {
               //first message
               if (speechData[0].isDone == false) {
@@ -337,7 +337,7 @@ const Chat = (props) => {
                   const data = [];
                   data.push(message);
                   data.push(speechData[0]);
-                  alert(speechData[0]);
+                 // alert(speechData[0]);
                   setResponses(responses => ([...responses, ...data]));
                   attempt = 0;
                   var msg = new SpeechSynthesisUtterance();
@@ -364,7 +364,7 @@ const Chat = (props) => {
               else if (speechData[0].isDone == true && speechData[1].isDone == false){
 
                 if(!isNaN(Number(response.data.transcribed_text.trim()))){
-                  alert("its a number");
+                 // alert("its a number");
 
                   if(ageCounter<1){
                     ageValue = Number(response.data.transcribed_text.trim());
@@ -399,7 +399,7 @@ const Chat = (props) => {
                   const data = [];
                   data.push(new Object(message));
                   if(ageValue==message.text){
-                      alert("age matching");
+                     // alert("age matching");
                       attempt = 0;
                       var speechValue = [...speechData];
                       speechValue[1].isDone = true;
@@ -415,7 +415,7 @@ const Chat = (props) => {
                   };
                   }
                   else{
-                    alert("age not matching");
+                    //alert("age not matching");
                     ageCounter = 0;
                     attempt++;
                     const data = [];
@@ -494,7 +494,7 @@ const Chat = (props) => {
                   const data = [];
                   data.push(new Object(message));
                   if(genderValue==sex){
-                      alert("gender matching");
+                     // alert("gender matching");
                       attempt = 0;
                       var speechValue = [...speechData];
                       speechValue[2].isDone = true;
@@ -510,7 +510,7 @@ const Chat = (props) => {
                   };
                   }
                   else{
-                    alert("gender not matching");
+                    //alert("gender not matching");
                     genderCounter = 0;
                     attempt++;
                     const data = [];
@@ -554,9 +554,36 @@ const Chat = (props) => {
               }
 
               //fouth message
-              if(speechData[2].isDone == true){
+             else if(speechData[2].isDone == true){
                 
+                  var test  = response.data.transcribed_text.trim();
+                  
+                  const testArr =  test.split(" ");
+                  console.log(testArr);
+                  var report ="";
+                  for(var i=0;i<testArr.length;i++){
 
+                    
+      
+    
+    
+                    if(testArr[i].toLowerCase()=='hdl' || testArr[i].toLowerCase()=='ldl' ||testArr[i].toLowerCase()=='ecg' || testArr[i].toLowerCase()=='ekg' ||  testArr[i].toLowerCase()=='cbc'){
+
+                      report = report + testArr[i] + " ";
+                    }
+                  }
+                  const data = [];
+                  data.push({
+                text: 'Your collected information is  your age is '+ageValue+'  and your gender is  '+genderValue+' and your tests is '+report+' Thank You ',
+
+                speech: true,
+               });
+               setResponses(responses => ([...responses, ...data]));
+
+               var msg = new SpeechSynthesisUtterance();
+               msg.text = 'Your collected information is  your age is '+ageValue+'  and your gender is  '+genderValue+' and your tests is '+report+' Thank You';
+             
+               window.speechSynthesis.speak(msg);
               }
 
             } else {
@@ -577,8 +604,13 @@ const Chat = (props) => {
             console.log('Error: ', error);
           });
       };
-    }, 5000);
-    alert('recording in progress');
+    }, 10000);
+    //alert('recording in progress');
+    setSpinnerLoading(true);
+    //setInterval(() => cnter--, 1000);
+
+   
+
     leftchannel = [];
     rightchannel = [];
     recorder = null;
@@ -681,7 +713,19 @@ const Chat = (props) => {
   }
 
   return (
+    
     <div className="chatSection">
+       <div className="botContainer">
+         <div className="loaderDiv">
+        <Loader
+       type="Puff"
+        color="#6c63ff"
+        height={80}
+        width={100}
+        visible={spinnerLoading}
+      />
+      </div>
+      </div>
       <div className="botContainer">
         <div className="messagesContainer">
           <div className="messageCard">
@@ -692,13 +736,16 @@ const Chat = (props) => {
               age={age}
               sex={gender}
             />
+            
           </div>
         </div>
 
         {/*The input section is 👇*/}
         <div className="inputSection">
-          <button class="fa fa-microphone microphone-ico"> </button>
-
+        
+       
+          <button  class="fa fa-microphone microphone-ico"> </button>
+      
           <input
             type="text"
             value={currentMessage}
