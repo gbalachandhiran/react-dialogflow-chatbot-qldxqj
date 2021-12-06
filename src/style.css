@@ -6,7 +6,7 @@ p {
 .chatSection {
   margin: auto;
   width: 26%;
-  height: 80vh;
+  height: 100vh;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   transition: 0.3s;
   border-radius: 20px;
@@ -50,7 +50,7 @@ p {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-top: 7px;
+ padding-top: 30%;
 }
 
 .messagesSection {
@@ -122,12 +122,39 @@ p {
   background: #6c63ff;
 }
 
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+.loaderDiv{
+  align-content: center;
+  text-align: center;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @media only screen and (min-width: 992px) {
   .inputSection {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-top: 21px;
+   margin-bottom: 20%;
   }
 
   .userCard {
