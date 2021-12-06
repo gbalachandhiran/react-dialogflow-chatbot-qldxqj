@@ -5,7 +5,7 @@ import Loader from "react-loader-spinner";
 
 import './style.css';
 import Messages from './Messages';
-import Timer  from './Timer';
+
 const Chat = (props) => {
   const [responses, setResponses] = useState([
     {
